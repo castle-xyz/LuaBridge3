@@ -27,7 +27,10 @@ constexpr void unused(Args&&...)
 
 // These functions and defines are for Luau.
 #if LUABRIDGE_ON_LUAU
-inline int luaL_ref(lua_State* L, int idx)
+
+// These normally don't exist in Luau, but we needed to define them in Luau to support love.
+// Don't want to make love depend on LuaBridge, so comment them out here.
+/*inline int luaL_ref(lua_State* L, int idx)
 {
     LUABRIDGE_ASSERT(idx == LUA_REGISTRYINDEX);
 
@@ -43,7 +46,7 @@ inline void luaL_unref(lua_State* L, int idx, int ref)
     unused(idx);
 
     lua_unref(L, ref);
-}
+}*/
 
 template <class T>
 inline void* lua_newuserdata_x(lua_State* L, size_t sz)
