@@ -76,7 +76,7 @@ protected:
         const int popsCount = m_stackSize - m_skipStackPops;
         if (popsCount > 0)
         {
-            LUABRIDGE_ASSERT(popsCount <= lua_gettop(L));
+            LUABRIDGE_ASSERT_VOID(popsCount <= lua_gettop(L));
 
             lua_pop(L, popsCount);
         }
@@ -165,7 +165,7 @@ class Namespace : public detail::Registrar
          */
         void createConstTable(const char* name, bool trueConst, Options options)
         {
-            LUABRIDGE_ASSERT(name != nullptr);
+            LUABRIDGE_ASSERT_VOID(name != nullptr);
 
             std::string type_name = std::string(trueConst ? "const " : "") + name;
 
@@ -205,7 +205,7 @@ class Namespace : public detail::Registrar
          */
         void createClassTable(const char* name, Options options)
         {
-            LUABRIDGE_ASSERT(name != nullptr);
+            LUABRIDGE_ASSERT_VOID(name != nullptr);
 
             // Stack: namespace table (ns), const table (co)
 
@@ -228,7 +228,7 @@ class Namespace : public detail::Registrar
          */
         void createStaticTable(const char* name, Options options)
         {
-            LUABRIDGE_ASSERT(name != nullptr);
+            LUABRIDGE_ASSERT_VOID(name != nullptr);
 
             // Stack: namespace table (ns), const table (co), class table (cl)
 
@@ -271,9 +271,9 @@ class Namespace : public detail::Registrar
         void assertStackState() const
         {
             // Stack: const table (co), class table (cl), static table (st)
-            LUABRIDGE_ASSERT(lua_istable(L, -3));
-            LUABRIDGE_ASSERT(lua_istable(L, -2));
-            LUABRIDGE_ASSERT(lua_istable(L, -1));
+            LUABRIDGE_ASSERT_VOID(lua_istable(L, -3));
+            LUABRIDGE_ASSERT_VOID(lua_istable(L, -2));
+            LUABRIDGE_ASSERT_VOID(lua_istable(L, -1));
         }
 
         //=========================================================================================
@@ -306,8 +306,8 @@ class Namespace : public detail::Registrar
         Class(const char* name, Namespace parent, Options options)
             : ClassBase(name, std::move(parent))
         {
-            LUABRIDGE_ASSERT(name != nullptr);
-            LUABRIDGE_ASSERT(lua_istable(L, -1)); // Stack: namespace table (ns)
+            LUABRIDGE_ASSERT_VOID(name != nullptr);
+            LUABRIDGE_ASSERT_VOID(lua_istable(L, -1)); // Stack: namespace table (ns)
 
             rawgetfield(L, -1, name); // Stack: ns, static table (st) | nil
 
@@ -352,7 +352,7 @@ class Namespace : public detail::Registrar
             }
             else
             {
-                LUABRIDGE_ASSERT(lua_istable(L, -1)); // Stack: ns, vst
+                LUABRIDGE_ASSERT_VOID(lua_istable(L, -1)); // Stack: ns, vst
                 ++m_stackSize;
 
                 lua_getmetatable(L, -1); // Stack: ns, vst, st
@@ -381,8 +381,8 @@ class Namespace : public detail::Registrar
         Class(const char* name, Namespace parent, const void* const staticKey, Options options)
             : ClassBase(name, std::move(parent))
         {
-            LUABRIDGE_ASSERT(name != nullptr);
-            LUABRIDGE_ASSERT(lua_istable(L, -1)); // Stack: namespace table (ns)
+            LUABRIDGE_ASSERT_VOID(name != nullptr);
+            LUABRIDGE_ASSERT_VOID(lua_istable(L, -1)); // Stack: namespace table (ns)
 
             createConstTable(name, true, options); // Stack: ns, const table (co)
             ++m_stackSize;
@@ -419,13 +419,13 @@ class Namespace : public detail::Registrar
                 return;
             }
 
-            LUABRIDGE_ASSERT(lua_istable(L, -1)); // Stack: ns, co, cl, st, pst
+            LUABRIDGE_ASSERT_VOID(lua_istable(L, -1)); // Stack: ns, co, cl, st, pst
 
             lua_rawgetp(L, -1, detail::getClassKey()); // Stack: ns, co, cl, st, pst, parent cl (pcl)
-            LUABRIDGE_ASSERT(lua_istable(L, -1));
+            LUABRIDGE_ASSERT_VOID(lua_istable(L, -1));
 
             lua_rawgetp(L, -1, detail::getConstKey()); // Stack: ns, co, cl, st, pst, pcl, parent co (pco)
-            LUABRIDGE_ASSERT(lua_istable(L, -1));
+            LUABRIDGE_ASSERT_VOID(lua_istable(L, -1));
 
             lua_rawsetp(L, -6, detail::getParentKey()); // co [parentKey] = pco. Stack: ns, co, cl, st, pst, pcl
             lua_rawsetp(L, -4, detail::getParentKey()); // cl [parentKey] = pcl. Stack: ns, co, cl, st, pst
@@ -447,7 +447,7 @@ class Namespace : public detail::Registrar
          */
         Namespace endClass()
         {
-            LUABRIDGE_ASSERT(m_stackSize > 3);
+            LUABRIDGE_ASSERT_ABORT(m_stackSize > 3);
 
             m_stackSize -= 3;
             lua_pop(L, 3);
@@ -1510,8 +1510,8 @@ class Namespace : public detail::Registrar
         {
             using FnType = decltype(function);
 
-            LUABRIDGE_ASSERT(name != nullptr);
-            LUABRIDGE_ASSERT(lua_istable(L, -1)); // Stack: namespace table (ns)
+            LUABRIDGE_ASSERT_ABORT(name != nullptr);
+            LUABRIDGE_ASSERT_ABORT(lua_istable(L, -1)); // Stack: namespace table (ns)
 
             lua_newuserdata_aligned<FnType>(L, std::move(function)); // Stack: ns, function userdata (ud)
             lua_pushcclosure_x(L, &detail::invoke_proxy_functor<FnType>, name, 1); // Stack: ns, function
@@ -1525,8 +1525,8 @@ class Namespace : public detail::Registrar
         {
             using FnType = decltype(function);
 
-            LUABRIDGE_ASSERT(name != nullptr);
-            LUABRIDGE_ASSERT(lua_istable(L, -1)); // Stack: namespace table (ns)
+            LUABRIDGE_ASSERT_ABORT(name != nullptr);
+            LUABRIDGE_ASSERT_ABORT(lua_istable(L, -1)); // Stack: namespace table (ns)
 
             lua_newuserdata_aligned<FnType>(L, std::move(function)); // Stack: ns, function userdata (ud)
             lua_pushcclosure_x(L, &detail::invoke_proxy_functor<FnType>, name, 1); // Stack: ns, function
@@ -1537,7 +1537,7 @@ class Namespace : public detail::Registrar
 
         Namespace endTable()
         {
-            LUABRIDGE_ASSERT(m_stackSize > 2);
+            LUABRIDGE_ASSERT_ABORT(m_stackSize > 2);
 
             m_stackSize -= 2;
             lua_pop(L, 2);
@@ -1572,7 +1572,7 @@ private:
     Namespace(lua_State* L, Options options, FromStack)
         : Registrar(L, 1)
     {
-        LUABRIDGE_ASSERT(lua_istable(L, -1));
+        LUABRIDGE_ASSERT_VOID(lua_istable(L, -1));
 
         lua_pushvalue(L, -1); // Stack: ns, ns
 
@@ -1616,8 +1616,8 @@ private:
     Namespace(const char* name, Namespace parent, Options options)
         : Registrar(std::move(parent))
     {
-        LUABRIDGE_ASSERT(name != nullptr);
-        LUABRIDGE_ASSERT(lua_istable(L, -1)); // Stack: parent namespace (pns)
+        LUABRIDGE_ASSERT_VOID(name != nullptr);
+        LUABRIDGE_ASSERT_VOID(lua_istable(L, -1)); // Stack: parent namespace (pns)
 
         rawgetfield(L, -1, name); // Stack: pns, namespace (ns) | nil
 
@@ -1739,7 +1739,7 @@ public:
             return Namespace(std::move(*this));
         }
 
-        LUABRIDGE_ASSERT(m_stackSize > 1);
+        LUABRIDGE_ASSERT_ABORT(m_stackSize > 1);
         --m_stackSize;
         lua_pop(L, 1);
 
@@ -1758,8 +1758,8 @@ public:
     template <class T>
     Namespace& addVariable(const char* name, const T& value)
     {
-        LUABRIDGE_ASSERT(name != nullptr);
-        LUABRIDGE_ASSERT(lua_istable(L, -1)); // Stack: namespace table (ns)
+        LUABRIDGE_ASSERT_ABORT(name != nullptr);
+        LUABRIDGE_ASSERT_ABORT(lua_istable(L, -1)); // Stack: namespace table (ns)
 
         if constexpr (std::is_enum_v<T>)
         {
@@ -1792,8 +1792,8 @@ public:
     template <class T, class = std::enable_if_t<std::is_base_of_v<T, LuaRef> || !std::is_invocable_v<T>>>
     Namespace& addProperty(const char* name, T* value, bool isWritable = true)
     {
-        LUABRIDGE_ASSERT(name != nullptr);
-        LUABRIDGE_ASSERT(lua_istable(L, -1)); // Stack: namespace table (ns)
+        LUABRIDGE_ASSERT_ABORT(name != nullptr);
+        LUABRIDGE_ASSERT_ABORT(lua_istable(L, -1)); // Stack: namespace table (ns)
 
         if (! checkTableHasPropertyGetter())
         {
@@ -1834,8 +1834,8 @@ public:
     template <class T, class = std::enable_if_t<std::is_base_of_v<T, LuaRef> || !std::is_invocable_v<T>>>
     Namespace& addProperty(const char* name, const T* value)
     {
-        LUABRIDGE_ASSERT(name != nullptr);
-        LUABRIDGE_ASSERT(lua_istable(L, -1)); // Stack: namespace table (ns)
+        LUABRIDGE_ASSERT_ABORT(name != nullptr);
+        LUABRIDGE_ASSERT_ABORT(lua_istable(L, -1)); // Stack: namespace table (ns)
 
         if (! checkTableHasPropertyGetter())
         {
@@ -1870,9 +1870,9 @@ public:
     template <class TG>
     Namespace& addProperty(const char* name, TG (*get)())
     {
-        LUABRIDGE_ASSERT(name != nullptr);
-        LUABRIDGE_ASSERT(get != nullptr);
-        LUABRIDGE_ASSERT(lua_istable(L, -1)); // Stack: namespace table (ns)
+        LUABRIDGE_ASSERT_ABORT(name != nullptr);
+        LUABRIDGE_ASSERT_ABORT(get != nullptr);
+        LUABRIDGE_ASSERT_ABORT(lua_istable(L, -1)); // Stack: namespace table (ns)
 
         if (! checkTableHasPropertyGetter())
         {
@@ -1895,10 +1895,10 @@ public:
     template <class TG, class TS = TG>
     Namespace& addProperty(const char* name, TG (*get)(), void (*set)(TS))
     {
-        LUABRIDGE_ASSERT(name != nullptr);
-        LUABRIDGE_ASSERT(get != nullptr);
-        LUABRIDGE_ASSERT(set != nullptr);
-        LUABRIDGE_ASSERT(lua_istable(L, -1)); // Stack: namespace table (ns)
+        LUABRIDGE_ASSERT_ABORT(name != nullptr);
+        LUABRIDGE_ASSERT_ABORT(get != nullptr);
+        LUABRIDGE_ASSERT_ABORT(set != nullptr);
+        LUABRIDGE_ASSERT_ABORT(lua_istable(L, -1)); // Stack: namespace table (ns)
 
         if (! checkTableHasPropertyGetter())
         {
@@ -1921,9 +1921,9 @@ public:
     template <class TG>
     Namespace& addProperty(const char* name, TG (*get)() noexcept)
     {
-        LUABRIDGE_ASSERT(name != nullptr);
-        LUABRIDGE_ASSERT(get != nullptr);
-        LUABRIDGE_ASSERT(lua_istable(L, -1)); // Stack: namespace table (ns)
+        LUABRIDGE_ASSERT_ABORT(name != nullptr);
+        LUABRIDGE_ASSERT_ABORT(get != nullptr);
+        LUABRIDGE_ASSERT_ABORT(lua_istable(L, -1)); // Stack: namespace table (ns)
 
         if (! checkTableHasPropertyGetter())
         {
@@ -1946,10 +1946,10 @@ public:
     template <class TG, class TS = TG>
     Namespace& addProperty(const char* name, TG (*get)() noexcept, void (*set)(TS) noexcept)
     {
-        LUABRIDGE_ASSERT(name != nullptr);
-        LUABRIDGE_ASSERT(get != nullptr);
-        LUABRIDGE_ASSERT(set != nullptr);
-        LUABRIDGE_ASSERT(lua_istable(L, -1)); // Stack: namespace table (ns)
+        LUABRIDGE_ASSERT_ABORT(name != nullptr);
+        LUABRIDGE_ASSERT_ABORT(get != nullptr);
+        LUABRIDGE_ASSERT_ABORT(set != nullptr);
+        LUABRIDGE_ASSERT_ABORT(lua_istable(L, -1)); // Stack: namespace table (ns)
 
         if (! checkTableHasPropertyGetter())
         {
@@ -1981,8 +1981,8 @@ public:
     template <class Getter, class = std::enable_if_t<!std::is_pointer_v<Getter> && std::is_invocable_v<Getter>>>
     Namespace& addProperty(const char* name, Getter get)
     {
-        LUABRIDGE_ASSERT(name != nullptr);
-        LUABRIDGE_ASSERT(lua_istable(L, -1)); // Stack: namespace table (ns)
+        LUABRIDGE_ASSERT_ABORT(name != nullptr);
+        LUABRIDGE_ASSERT_ABORT(lua_istable(L, -1)); // Stack: namespace table (ns)
 
         if (! checkTableHasPropertyGetter())
         {
@@ -2020,8 +2020,8 @@ public:
             && std::is_invocable_v<Setter, std::invoke_result_t<Getter>>>>
     Namespace& addProperty(const char* name, Getter get, Setter set)
     {
-        LUABRIDGE_ASSERT(name != nullptr);
-        LUABRIDGE_ASSERT(lua_istable(L, -1)); // Stack: namespace table (ns)
+        LUABRIDGE_ASSERT_ABORT(name != nullptr);
+        LUABRIDGE_ASSERT_ABORT(lua_istable(L, -1)); // Stack: namespace table (ns)
 
         if (! checkTableHasPropertyGetter())
         {
@@ -2055,9 +2055,9 @@ public:
      */
     Namespace& addProperty(const char* name, lua_CFunction get)
     {
-        LUABRIDGE_ASSERT(name != nullptr);
-        LUABRIDGE_ASSERT(get != nullptr);
-        LUABRIDGE_ASSERT(lua_istable(L, -1)); // Stack: namespace table (ns)
+        LUABRIDGE_ASSERT_ABORT(name != nullptr);
+        LUABRIDGE_ASSERT_ABORT(get != nullptr);
+        LUABRIDGE_ASSERT_ABORT(lua_istable(L, -1)); // Stack: namespace table (ns)
 
         if (! checkTableHasPropertyGetter())
         {
@@ -2078,10 +2078,10 @@ public:
 
     Namespace& addProperty(const char* name, lua_CFunction get, lua_CFunction set)
     {
-        LUABRIDGE_ASSERT(name != nullptr);
-        LUABRIDGE_ASSERT(get != nullptr);
-        LUABRIDGE_ASSERT(set != nullptr);
-        LUABRIDGE_ASSERT(lua_istable(L, -1)); // Stack: namespace table (ns)
+        LUABRIDGE_ASSERT_ABORT(name != nullptr);
+        LUABRIDGE_ASSERT_ABORT(get != nullptr);
+        LUABRIDGE_ASSERT_ABORT(set != nullptr);
+        LUABRIDGE_ASSERT_ABORT(lua_istable(L, -1)); // Stack: namespace table (ns)
 
         if (! checkTableHasPropertyGetter())
         {
@@ -2112,8 +2112,8 @@ public:
     auto addFunction(const char* name, Functions... functions)
         -> std::enable_if_t<(detail::is_callable_v<Functions> && ...) && (sizeof...(Functions) > 0), Namespace&>
     {
-        LUABRIDGE_ASSERT(name != nullptr);
-        LUABRIDGE_ASSERT(lua_istable(L, -1)); // Stack: namespace table (ns)
+        LUABRIDGE_ASSERT_ABORT(name != nullptr);
+        LUABRIDGE_ASSERT_ABORT(lua_istable(L, -1)); // Stack: namespace table (ns)
 
         if constexpr (sizeof...(Functions) == 1)
         {

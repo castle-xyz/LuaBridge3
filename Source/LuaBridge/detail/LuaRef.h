@@ -86,7 +86,7 @@ protected:
     LuaRefBase(lua_State* L) noexcept
         : m_L(L)
     {
-        LUABRIDGE_ASSERT(L != nullptr);
+        LUABRIDGE_ASSERT_VOID(L != nullptr);
     }
 
     //=============================================================================================
@@ -765,7 +765,7 @@ class LuaRef : public LuaRefBase<LuaRef, LuaRef>
 
         void push(lua_State* L) const
         {
-            LUABRIDGE_ASSERT(equalstates(L, m_L));
+            LUABRIDGE_ASSERT_VOID(equalstates(L, m_L));
 
 #if LUABRIDGE_SAFE_STACK_CHECKS
             if (! lua_checkstack(L, 3))
@@ -1143,7 +1143,7 @@ public:
 
     void push(lua_State* L) const
     {
-        LUABRIDGE_ASSERT(equalstates(L, m_L));
+        LUABRIDGE_ASSERT_VOID(equalstates(L, m_L));
 
 #if LUABRIDGE_SAFE_STACK_CHECKS
         if (! lua_checkstack(L, 1))
@@ -1164,7 +1164,7 @@ public:
 
     void pop(lua_State* L)
     {
-        LUABRIDGE_ASSERT(equalstates(L, m_L));
+        LUABRIDGE_ASSERT_VOID(equalstates(L, m_L));
 
         if (m_ref != LUA_NOREF)
             luaL_unref(L, LUA_REGISTRYINDEX, m_ref);

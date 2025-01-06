@@ -394,7 +394,7 @@ inline int rawgetfield(lua_State* L, int index, const char* key)
  */
 inline void rawsetfield(lua_State* L, int index, const char* key)
 {
-    LUABRIDGE_ASSERT(lua_istable(L, index));
+    LUABRIDGE_ASSERT_VOID(lua_istable(L, index));
     index = lua_absindex(L, index);
     lua_pushstring(L, key);
     lua_insert(L, -2);

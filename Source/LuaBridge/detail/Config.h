@@ -96,10 +96,12 @@
 #endif
 #endif
 
-#if !defined(LUABRIDGE_ASSERT)
-#if defined(NDEBUG) && !defined(LUABRIDGE_FORCE_ASSERT_RELEASE)
-#define LUABRIDGE_ASSERT(expr) ((void)(expr))
-#else
-#define LUABRIDGE_ASSERT(expr) assert(expr)
-#endif
-#endif
+//#if !defined(LUABRIDGE_ASSERT)
+//#if defined(NDEBUG) && !defined(LUABRIDGE_FORCE_ASSERT_RELEASE)
+//#define LUABRIDGE_ASSERT(expr) ((void)(expr))
+//#else
+#define LUABRIDGE_ASSERT(expr) if (!(expr)) { return {}; }
+#define LUABRIDGE_ASSERT_VOID(expr) if (!(expr)) { return; }
+#define LUABRIDGE_ASSERT_ABORT(expr) if (!(expr)) { abort(); }
+//#endif
+//#endif

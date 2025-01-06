@@ -191,7 +191,7 @@ inline Options get_class_options(lua_State* L, int index)
  */
 inline void push_class_or_const_table(lua_State* L, int index)
 {
-    LUABRIDGE_ASSERT(lua_istable(L, index)); // Stack: mt
+    LUABRIDGE_ASSERT_VOID(lua_istable(L, index)); // Stack: mt
 
     lua_rawgetp(L, index, getClassKey()); // Stack: mt, class table (ct) | nil
     if (! lua_istable(L, -1)) // Stack: mt, nil
@@ -679,9 +679,9 @@ inline void add_property_getter(lua_State* L, const char* name, int tableIndex)
     luaL_checkstack(L, 2, detail::error_lua_stack_overflow);
 #endif
 
-    LUABRIDGE_ASSERT(name != nullptr);
-    LUABRIDGE_ASSERT(lua_istable(L, tableIndex));
-    LUABRIDGE_ASSERT(lua_iscfunction(L, -1)); // Stack: getter
+    LUABRIDGE_ASSERT_VOID(name != nullptr);
+    LUABRIDGE_ASSERT_VOID(lua_istable(L, tableIndex));
+    LUABRIDGE_ASSERT_VOID(lua_iscfunction(L, -1)); // Stack: getter
 
     lua_rawgetp(L, tableIndex, getPropgetKey()); // Stack: getter, propget table (pg)
     lua_pushvalue(L, -2); // Stack: getter, pg, getter
@@ -764,9 +764,9 @@ inline void add_property_setter(lua_State* L, const char* name, int tableIndex)
     luaL_checkstack(L, 2, detail::error_lua_stack_overflow);
 #endif
 
-    LUABRIDGE_ASSERT(name != nullptr);
-    LUABRIDGE_ASSERT(lua_istable(L, tableIndex));
-    LUABRIDGE_ASSERT(lua_iscfunction(L, -1)); // Stack: setter
+    LUABRIDGE_ASSERT_VOID(name != nullptr);
+    LUABRIDGE_ASSERT_VOID(lua_istable(L, tableIndex));
+    LUABRIDGE_ASSERT_VOID(lua_iscfunction(L, -1)); // Stack: setter
 
     lua_rawgetp(L, tableIndex, getPropsetKey()); // Stack: setter, propset table (ps)
     lua_pushvalue(L, -2); // Stack: setter, ps, setter

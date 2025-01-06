@@ -52,7 +52,7 @@ public:
      */
     static void raise(lua_State* L, std::error_code code)
     {
-        LUABRIDGE_ASSERT(areExceptionsEnabled(L));
+        LUABRIDGE_ASSERT_VOID(areExceptionsEnabled(L));
 
 #if LUABRIDGE_HAS_EXCEPTIONS
         throw LuaException(L, code, FromLua{});

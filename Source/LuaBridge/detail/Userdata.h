@@ -497,7 +497,7 @@ private:
     explicit UserdataPtr(void* ptr)
     {
         // Can't construct with a null object!
-        LUABRIDGE_ASSERT(ptr != nullptr);
+        LUABRIDGE_ASSERT_VOID(ptr != nullptr);
         m_p = ptr;
     }
 };
@@ -567,11 +567,11 @@ private:
     UserdataValueExternal(void* ptr, void (*dealloc)(T*)) noexcept
     {
         // Can't construct with a null object!
-        LUABRIDGE_ASSERT(ptr != nullptr);
+        LUABRIDGE_ASSERT_VOID(ptr != nullptr);
         m_p = ptr;
 
         // Can't construct with a null deallocator!
-        LUABRIDGE_ASSERT(dealloc != nullptr);
+        LUABRIDGE_ASSERT_VOID(dealloc != nullptr);
         m_dealloc = dealloc;
     }
 
